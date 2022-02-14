@@ -1,5 +1,9 @@
 use eframe::{egui::{self, RichText}, epi};
 
+//front_of_house::hosting::add_to_waitlist();
+use crate::Profile;
+use crate::{Exam};
+
 /// We derive Deserialize/Serialize so we can persist app state on shutdown.
 #[cfg_attr(feature = "persistence", derive(serde::Deserialize, serde::Serialize))]
 #[cfg_attr(feature = "persistence", serde(default))] // if we add new fields, give them default values when deserializing old state
@@ -7,18 +11,54 @@ pub struct TemplateApp {
     // Example stuff:    
     user: User,
     test_begin: bool,
+    answers: Answers,
     // this how you opt-out of serialization of a member
     #[cfg_attr(feature = "persistence", serde(skip))]
     value: f32,
 }
 
+
+
 #[cfg_attr(feature = "persistence", derive(serde::Deserialize, serde::Serialize))]
 #[cfg_attr(feature = "persistence", serde(default))] // if we add new fields, give them default values when deserializing old state
 pub struct User {
-    username: String,
-    password: String,
-    group: String
+    pub username: String,
+    pub password: String,
+    pub group: String
 }
+
+#[derive(PartialEq)]
+pub enum Question1 {
+    First,
+    Second
+}
+#[derive(PartialEq)]
+pub enum Question2 {
+    First,
+    Second
+}
+#[derive(PartialEq)]
+enum Question3 {
+    First,
+    Second
+}
+#[derive(PartialEq)]
+enum Question4 {
+    First,
+    Second
+}
+#[derive(PartialEq)]
+enum Question5 {
+    First,
+    Second
+}
+
+pub struct Answers {
+    pub first: Question1,
+    pub second: Question2,
+}
+
+
 
 impl Default for User {
     fn default() -> Self {
@@ -37,39 +77,20 @@ impl Default for TemplateApp {
             },
             value: 2.7,
             test_begin: false,
+            answers: Answers {
+                first: Question1::First,
+                second: Question2::First,
+            }
         }
     }
 }
-
-fn display_profile(user: &mut User, ctx: &egui::CtxRef, frame: &epi::Frame) {
-    egui::SidePanel::left("side_panel").resizable(false).show(ctx, |ui| {
-        ui.spacing_mut().item_spacing.y = 10.0;
-        ui.heading("Profile");
-        ui.add(egui::Separator::default().horizontal());
-        ui.with_layout(egui::Layout::top_down(egui::Align::TOP), |ui| {
-            ui.horizontal(|ui| {
-                ui.add(egui::Label::new(RichText::new("Studend name: ").text_style(egui::TextStyle::Monospace)));
-                ui.add(egui::Label::new(RichText::new(&user.username).text_style(egui::TextStyle::Monospace)));                        
-            });
-            ui.add(egui::Separator::default().horizontal());
-            ui.horizontal(|ui| {
-                ui.add(egui::Label::new(RichText::new("Student password: ").text_style(egui::TextStyle::Monospace)));
-                ui.add(egui::Label::new(RichText::new(&user.password).text_style(egui::TextStyle::Monospace)));
-            });
-        });
-
-        
-   });            
-}
-
-
 
 impl epi::App for TemplateApp {
     
     /// Called each time the UI needs repainting, which may be many times per second.
     /// Put your widgets into a `SidePanel`, `TopPanel`, `CentralPanel`, `Window` or `Area`.
     fn update(&mut self, ctx: &egui::CtxRef, frame: &epi::Frame) {
-        let Self { user, value, test_begin } = self;
+        let Self { user, value, test_begin , answers} = self;
 
         // Examples of how to create different panels and windows.
         // Pick whichever suits you.
@@ -92,9 +113,6 @@ impl epi::App for TemplateApp {
             });
         });
 
-        
-         
-
         let style = egui::TextStyle::Heading;
         
         egui::CentralPanel::default().show(ctx, |ui| {
@@ -105,17 +123,23 @@ impl epi::App for TemplateApp {
             ui.add(egui::TextEdit::singleline(&mut user.username).text_style(style));
             ui.label("Password: ");
             ui.add(egui::TextEdit::singleline(&mut user.password).password(true).text_style(style));
-            let button = egui::Button::new("Login").text_style(egui::TextStyle::Button);
+            let button = egui::Button::new(RichText::new("Login").text_style(egui::TextStyle::Button));
             if ui.add(button).clicked() {
                 *test_begin = true;
             }
                         
             //egui::warn_if_debug_build(ui);
         });
-        if *test_begin == true {
-            display_profile(user, ctx, frame);
+        if *test_begin {
+            Profile::display_profile(user, ctx, frame);
             egui::CentralPanel::default().show(ctx, |ui| {
-                
+                let exam = Exam::new();
+                exam.render(ui, answers);
+                if answers.first == Question1::Second {
+                    egui::Window::new("My Window").show(ctx, |ui| {
+                        ui.label("Hello World!");
+                     });
+                }
             });        
         }
         if false {

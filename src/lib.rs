@@ -3,6 +3,8 @@
 #![warn(clippy::all, rust_2018_idioms)]
 
 mod app;
+mod exam;
+mod profile;
 pub use app::TemplateApp;
 
 // ----------------------------------------------------------------------------
@@ -21,3 +23,9 @@ pub fn start(canvas_id: &str) -> Result<(), eframe::wasm_bindgen::JsValue> {
     let app = TemplateApp::default();
     eframe::start_web(canvas_id, Box::new(app))
 }
+
+
+pub use profile::component::Profile;
+pub use exam::Ex::Exam;
+
+

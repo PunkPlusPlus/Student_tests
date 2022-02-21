@@ -1,18 +1,16 @@
 use eframe::{egui::{self, RichText}, epi};
 
-//front_of_house::hosting::add_to_waitlist();
 use crate::Profile;
 use crate::{Exam};
+use crate::exam::Ex::{Variants, Answers};
 
 /// We derive Deserialize/Serialize so we can persist app state on shutdown.
 #[cfg_attr(feature = "persistence", derive(serde::Deserialize, serde::Serialize))]
 #[cfg_attr(feature = "persistence", serde(default))] // if we add new fields, give them default values when deserializing old state
 pub struct TemplateApp {
-    // Example stuff:    
     user: User,
     test_begin: bool,
     answers: Answers,
-    // this how you opt-out of serialization of a member
     #[cfg_attr(feature = "persistence", serde(skip))]
     value: f32,
 }
@@ -27,36 +25,9 @@ pub struct User {
     pub group: String
 }
 
-#[derive(PartialEq)]
-pub enum Question1 {
-    First,
-    Second
-}
-#[derive(PartialEq)]
-pub enum Question2 {
-    First,
-    Second
-}
-#[derive(PartialEq)]
-enum Question3 {
-    First,
-    Second
-}
-#[derive(PartialEq)]
-enum Question4 {
-    First,
-    Second
-}
-#[derive(PartialEq)]
-enum Question5 {
-    First,
-    Second
-}
 
-pub struct Answers {
-    pub first: Question1,
-    pub second: Question2,
-}
+
+
 
 
 
@@ -78,8 +49,11 @@ impl Default for TemplateApp {
             value: 2.7,
             test_begin: false,
             answers: Answers {
-                first: Question1::First,
-                second: Question2::First,
+                first: Variants::First,
+                second: Variants::First,
+                third: Variants::First,
+                fourth: Variants::First,
+                five: Variants::First
             }
         }
     }
@@ -87,15 +61,8 @@ impl Default for TemplateApp {
 
 impl epi::App for TemplateApp {
     
-    /// Called each time the UI needs repainting, which may be many times per second.
-    /// Put your widgets into a `SidePanel`, `TopPanel`, `CentralPanel`, `Window` or `Area`.
     fn update(&mut self, ctx: &egui::CtxRef, frame: &epi::Frame) {
         let Self { user, value, test_begin , answers} = self;
-
-        // Examples of how to create different panels and windows.
-        // Pick whichever suits you.
-        // Tip: a good default choice is to just keep the `CentralPanel`.
-        // For inspiration and more examples, go to https://emilk.github.io/egui
 
         egui::TopBottomPanel::top("top_panel").show(ctx, |ui| {
             // The top panel is often a good place for a menu bar:
@@ -135,12 +102,13 @@ impl epi::App for TemplateApp {
             egui::CentralPanel::default().show(ctx, |ui| {
                 let exam = Exam::new();
                 exam.render(ui, answers);
-                if answers.first == Question1::Second {
+                if answers.first == Variants::Second && answers.second == Variants::Second{
                     egui::Window::new("My Window").show(ctx, |ui| {
                         ui.label("Hello World!");
                      });
                 }
-            });        
+                
+            });
         }
         if false {
             egui::Window::new("Window").show(ctx, |ui| {

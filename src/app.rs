@@ -1,4 +1,4 @@
-use eframe::{egui::{self, RichText}, epi};
+use eframe::{egui::{self, RichText, Sense}, epi};
 
 use crate::Profile;
 use crate::{Exam};
@@ -9,13 +9,13 @@ use crate::exam::Ex::{Variants, Answers};
 #[cfg_attr(feature = "persistence", serde(default))] // if we add new fields, give them default values when deserializing old state
 pub struct TemplateApp {
     user: User,
+    login: bool,
+    test_passed: bool,
     test_begin: bool,
     answers: Answers,
     #[cfg_attr(feature = "persistence", serde(skip))]
-    value: f32,
+    attempt: u32,
 }
-
-
 
 #[cfg_attr(feature = "persistence", derive(serde::Deserialize, serde::Serialize))]
 #[cfg_attr(feature = "persistence", serde(default))] // if we add new fields, give them default values when deserializing old state
@@ -24,12 +24,6 @@ pub struct User {
     pub password: String,
     pub group: String
 }
-
-
-
-
-
-
 
 impl Default for User {
     fn default() -> Self {
@@ -46,7 +40,9 @@ impl Default for TemplateApp {
                 password: "".to_string(),
                 group: "".to_string()
             },
-            value: 2.7,
+            attempt: 0,
+            login: false,
+            test_passed: false,
             test_begin: false,
             answers: Answers {
                 first: Variants::First,
@@ -62,7 +58,7 @@ impl Default for TemplateApp {
 impl epi::App for TemplateApp {
     
     fn update(&mut self, ctx: &egui::CtxRef, frame: &epi::Frame) {
-        let Self { user, value, test_begin , answers} = self;
+        let Self { user, attempt, test_begin , answers, login, test_passed} = self;
 
         egui::TopBottomPanel::top("top_panel").show(ctx, |ui| {
             // The top panel is often a good place for a menu bar:
@@ -85,31 +81,38 @@ impl epi::App for TemplateApp {
         egui::CentralPanel::default().show(ctx, |ui| {
             // The central panel the region left after adding TopPanel's and SidePanel's
             ui.spacing_mut().item_spacing.y = 10.0;
-            ui.heading("Login form");
-            ui.label("Username: ");
+            ui.heading(RichText::new("Login form"));
+            ui.label(RichText::new("Username: "));
             ui.add(egui::TextEdit::singleline(&mut user.username).text_style(style));
             ui.label("Password: ");
             ui.add(egui::TextEdit::singleline(&mut user.password).password(true).text_style(style));
-            let button = egui::Button::new(RichText::new("Login").text_style(egui::TextStyle::Button));
+            let mut button = egui::Button::new(RichText::new("Login").text_style(egui::TextStyle::Button));
+            if user.username.chars().count() == 0 || user.password.chars().count() == 0 {
+                button = button.sense(Sense::hover());
+            }            
             if ui.add(button).clicked() {
-                *test_begin = true;
+                *login = true;
             }
-                        
+            if *login {
+                Profile::display_profile(user, ctx, attempt, answers, test_begin, test_passed);
+                egui::SidePanel::left("exam_panel").resizable(false).show(ctx, |ui| {
+                    if *test_begin {
+                        let exam = Exam::new();
+                        exam.render(ui, answers, attempt, test_begin, test_passed);
+                    }
+                    if *test_passed {
+                        if answers.first == Variants::Second && answers.second == Variants::Second{
+                            egui::Window::new("My Window").show(ctx, |ui| {
+                                ui.label("Hello World!");
+                             });
+                        }    
+                    }
+                                    
+                });
+            }            
             //egui::warn_if_debug_build(ui);
         });
-        if *test_begin {
-            Profile::display_profile(user, ctx, frame);
-            egui::CentralPanel::default().show(ctx, |ui| {
-                let exam = Exam::new();
-                exam.render(ui, answers);
-                if answers.first == Variants::Second && answers.second == Variants::Second{
-                    egui::Window::new("My Window").show(ctx, |ui| {
-                        ui.label("Hello World!");
-                     });
-                }
-                
-            });
-        }
+        
         if false {
             egui::Window::new("Window").show(ctx, |ui| {
                 ui.label("Windows can be moved by dragging them.");
@@ -118,8 +121,7 @@ impl epi::App for TemplateApp {
                 ui.label("You would normally chose either panels OR windows.");
             });
         }
-    }
-    
+    }    
 
     /// Called once before the first frame.
     fn setup(

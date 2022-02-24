@@ -1,4 +1,6 @@
 pub mod Ex {
+    use std::env::VarError;
+
     use eframe::egui::{self, Button, Color32, RichText};
     //use crate::app::Answers;
 
@@ -17,8 +19,8 @@ pub mod Ex {
         pub five: Variants
     }
 
-    struct Question {
-        title: String,
+    pub struct Question {
+        pub title: String,
         //variants: Vec<Variant>,
     }
 
@@ -44,6 +46,18 @@ pub mod Ex {
             Exam {
                 questions: Vec::from_iter(it),
             }
+        }
+
+        pub fn check(an: &Answers) -> bool {
+            if an.first == Variants::First && an.second == Variants::Second && an.third == Variants::Second && an.fourth == Variants::First && an.five == Variants::First {
+                return true;    
+            } else {
+                return false;
+            }
+        }
+
+        pub fn getQuestions(ex: Exam) -> Vec<Question> {
+            return ex.questions;
         }
 
         /*

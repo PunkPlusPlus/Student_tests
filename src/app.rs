@@ -3,6 +3,7 @@ use eframe::{egui::{self, RichText, Sense}, epi};
 use crate::Profile;
 use crate::{Exam};
 use crate::exam::Ex::{Variants, Answers};
+use crate::{res};
 
 /// We derive Deserialize/Serialize so we can persist app state on shutdown.
 #[cfg_attr(feature = "persistence", derive(serde::Deserialize, serde::Serialize))]
@@ -65,12 +66,11 @@ impl epi::App for TemplateApp {
             egui::menu::bar(ui, |ui| {
                 ui.menu_button("Menu", |ui| {
                     if ui.button("Back").clicked() {
-                        if *test_begin {
-                            *test_begin = false;
+                        if *login {
+                            *login = false;
                         } else {
                             frame.quit();
-                        }
-                        
+                        }                        
                     }
                 });
             });
@@ -101,11 +101,16 @@ impl epi::App for TemplateApp {
                         exam.render(ui, answers, attempt, test_begin, test_passed);
                     }
                     if *test_passed {
-                        if answers.first == Variants::Second && answers.second == Variants::Second{
-                            egui::Window::new("My Window").show(ctx, |ui| {
-                                ui.label("Hello World!");
-                             });
-                        }    
+                        let mut win = Exam::check(answers);
+                        let res = res::get_instance(answers);
+                        //let questions = Exam::getQuestions(exam);
+                        res.render(ui, &res);
+                        ui.add(egui::Separator::default().horizontal());
+                        if win {
+                            ui.label("You win!");
+                        } else {
+                            ui.label("You loose!");
+                        }
                     }
                                     
                 });

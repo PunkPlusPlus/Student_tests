@@ -5,6 +5,7 @@
 mod app;
 mod exam;
 mod profile;
+mod results;
 pub use app::TemplateApp;
 
 // ----------------------------------------------------------------------------
@@ -27,5 +28,6 @@ pub fn start(canvas_id: &str) -> Result<(), eframe::wasm_bindgen::JsValue> {
 
 pub use profile::component::Profile;
 pub use exam::Ex::Exam;
+pub use results::Results::res;
 
 

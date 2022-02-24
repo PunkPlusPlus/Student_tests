@@ -96,20 +96,19 @@ impl epi::App for TemplateApp {
             if *login {
                 Profile::display_profile(user, ctx, attempt, answers, test_begin, test_passed);
                 egui::SidePanel::left("exam_panel").resizable(false).show(ctx, |ui| {
-                    if *test_begin {
-                        let exam = Exam::new();
+                    let exam = Exam::new();
+                    if *test_begin {                        
                         exam.render(ui, answers, attempt, test_begin, test_passed);
                     }
                     if *test_passed {
-                        let mut win = Exam::check(answers);
+                        let win = Exam::check(answers);
                         let res = res::get_instance(answers);
-                        //let questions = Exam::getQuestions(exam);
-                        res.render(ui, &res);
+                        res.new_render(ui, &res, exam.questions);
                         ui.add(egui::Separator::default().horizontal());
                         if win {
-                            ui.label("You win!");
+                            ui.label("Test passed!");
                         } else {
-                            ui.label("You loose!");
+                            ui.label("Try again!");
                         }
                     }
                                     

@@ -8,7 +8,7 @@ pub mod Ex {
     //const WHITE: Color32 = Color32::from_rgb(255, 255, 255);
     const CYAN: Color32 = Color32::from_rgb(0, 255, 255);
     pub struct Exam {
-        questions: Vec<Question>,
+        pub questions: Vec<Question>,
     }
 
     pub struct Answers {

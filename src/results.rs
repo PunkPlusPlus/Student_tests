@@ -12,7 +12,7 @@ pub mod Results {
     }
 
     const RED: Color32 = Color32::from_rgb(245, 87, 66);
-    const GREEN: Color32 = Color32::from_rgb(66, 245, 105);
+    const GREEN: Color32 = Color32::from_rgb(7, 186, 37);
 
     impl res {
         pub fn get_instance(answers: &Answers) -> res {

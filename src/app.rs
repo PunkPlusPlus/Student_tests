@@ -60,7 +60,7 @@ impl epi::App for TemplateApp {
     
     fn update(&mut self, ctx: &egui::CtxRef, frame: &epi::Frame) {
         let Self { user, attempt, test_begin , answers, login, test_passed} = self;
-        ctx.set_visuals(Visuals::light());
+        ctx.set_visuals(Visuals::dark());
         egui::TopBottomPanel::top("top_panel").show(ctx, |ui| {
             // The top panel is often a good place for a menu bar:
             egui::menu::bar(ui, |ui| {
@@ -171,7 +171,7 @@ impl epi::App for TemplateApp {
         // NOTE: a bright gray makes the shadows of the windows look weird.
         // We use a bit of transparency so that if the user switches on the
         // `transparent()` option they get immediate results.
-        egui::Color32::from_rgba_unmultiplied(12, 12, 12, 180).into()
+        egui::Color32::from_rgba_unmultiplied(1, 1, 120, 180).into()
     }
 
     fn persist_native_window(&self) -> bool {

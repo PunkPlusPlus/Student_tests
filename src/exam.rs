@@ -6,7 +6,7 @@ pub mod Ex {
 
     pub const PADDING: f32 = 5.0;
     //const WHITE: Color32 = Color32::from_rgb(255, 255, 255);
-    const CYAN: Color32 = Color32::from_rgb(0, 255, 255);
+    const CYAN: Color32 = Color32::from_rgb(115, 4, 212);
     pub struct Exam {
         pub questions: Vec<Question>,
     }

@@ -1,4 +1,4 @@
-use eframe::{egui::{self, RichText, Sense}, epi};
+use eframe::{egui::{self, RichText, Sense, Visuals}, epi};
 
 use crate::Profile;
 use crate::{Exam};
@@ -60,7 +60,7 @@ impl epi::App for TemplateApp {
     
     fn update(&mut self, ctx: &egui::CtxRef, frame: &epi::Frame) {
         let Self { user, attempt, test_begin , answers, login, test_passed} = self;
-
+        ctx.set_visuals(Visuals::light());
         egui::TopBottomPanel::top("top_panel").show(ctx, |ui| {
             // The top panel is often a good place for a menu bar:
             egui::menu::bar(ui, |ui| {
@@ -104,7 +104,6 @@ impl epi::App for TemplateApp {
                         let win = Exam::check(answers);
                         let res = res::get_instance(answers);
                         res.new_render(ui, &res, exam.questions);
-                        ui.add(egui::Separator::default().horizontal());
                         if win {
                             ui.label("Test passed!");
                         } else {
